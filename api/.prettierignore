@@ -1,0 +1,4 @@
+node_modules/
+ssl/
+coverage/
+package-lock.json
