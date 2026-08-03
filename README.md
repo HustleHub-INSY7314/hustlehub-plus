@@ -31,6 +31,9 @@ _TODO: Describe the system, its intended users (Clients, Freelancers, Admin),
 and what the backend does. Keep it clear and professional._
 
 ## Architecture
+![HustleHub+ MERN architecture diagram](docs/images/architecture-diagram.png)
+
+*Figure 1: HustleHub+ system architecture. Solid components are implemented in Part 1; dashed components are planned for Part 2. Security controls sit at the API boundary — every request passes validation and JWT verification before reaching application logic.*
 <!-- OWNER: Member C -->
 _TODO: Insert the MERN architecture diagram (image) showing components, security
 features, and system boundaries. Explain the request flow: client → HTTPS →
