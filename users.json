@@ -1,0 +1,10 @@
+[
+  {
+    "id": "9b134602-6381-45d9-9f12-5c6e825409f3",
+    "name": "John Freelancer",
+    "email": "john@example.com",
+    "passwordHash": "$2b$12$rXjZG5BhQADQto3d5i24gufp/aw2wcG2DcCQaWp1qVNVGIHWgHEna",
+    "role": "freelancer",
+    "createdAt": "2026-08-11T13:20:01.979Z"
+  }
+]

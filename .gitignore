@@ -1,34 +1,7 @@
-# ---- Dependencies ----
 node_modules/
-client/node_modules/
-
-# ---- Environment & secrets (NEVER commit these) ----
-# Ignore all .env files (.env, .env.production, etc.)...
 .env
-.env.*
-# ...but DO commit the template so the team shares the same variable list.
-!.env.example
-
-# ---- SSL certificates / private keys (NEVER commit) ----
-*.key
-*.crt
-*.pem
-
-# ---- Build output ----
-client/build/
-client/dist/
-dist/
-
-# ---- Logs ----
-logs/
-*.log
+data/users.json
+certs/server.key
+certs/server.crt
 npm-debug.log*
-
-# ---- OS / editor junk ----
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# ---- Test / coverage ----
-coverage/

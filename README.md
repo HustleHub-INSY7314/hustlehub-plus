@@ -1,156 +1,264 @@
-# HustleHub+ — Secure Freelance Marketplace
+# HustleHub+ — Part 1: Secure Foundations
 
-INSY7314 / APDS7311 Portfolio of Evidence — Group Project
+## 1. Purpose
 
-HustleHub+ is a secure freelance marketplace platform that allows freelancers to
-advertise services (gigs) and clients to browse and book them. It records simulated
-financial transactions and gives freelancers an indication of income earned and
-estimated tax obligations. Security is treated as a primary concern throughout.
+HustleHub+ is a secure freelance marketplace backend. Part 1 establishes the secure backend foundation required before marketplace functionality is added in Part 2.
 
-> **Part 1 scope:** secure backend foundations — registration, login, JWT-protected
-> routes, HTTPS, input validation, and safe error handling.
+The Part 1 API supports:
+- User registration
+- Secure password hashing
+- User login
+- JWT generation
+- JWT validation on protected routes
+- Input validation
+- HTTPS
+- Controlled error responses
+- Local file-based user storage
+- Basic API testing through Postman
 
----
+## 2. Architecture
 
-## Table of Contents
-- [System Overview](#system-overview)
-- [Architecture](#architecture)
-- [Security Decisions](#security-decisions)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Endpoints](#api-endpoints)
-- [Testing (Postman)](#testing-postman)
-- [Team & Contributions](#team--contributions)
-- [Demonstration Video](#demonstration-video)
-
----
-
-## System Overview
-<!-- OWNER: Member C -->
-_TODO: Describe the system, its intended users (Clients, Freelancers, Admin),
-and what the backend does. Keep it clear and professional._
-
-## Architecture
-![HustleHub+ MERN architecture diagram](docs/images/architecture-diagram.png)
-
-*Figure 1: HustleHub+ system architecture. Solid components are implemented in Part 1; dashed components are planned for Part 2. Security controls sit at the API boundary — every request passes validation and JWT verification before reaching application logic.*
-<!-- OWNER: Member C -->
-_TODO: Insert the MERN architecture diagram (image) showing components, security
-features, and system boundaries. Explain the request flow: client → HTTPS →
-Express → middleware (validate, auth) → controller → MongoDB._
-
-## Security Decisions
-<!-- OWNERS: Member A (hashing, JWT) + Member B (HTTPS, validation, errors) -->
-This section carries significant marks — explain **why**, not just what.
-
-### Password Hashing
-<!-- Member A -->
-_TODO: Explain bcrypt, salting, why plain-text is never stored._
-
-### Token-Based Authentication (JWT)
-<!-- Member A -->
-_TODO: Explain the JWT flow, what the payload contains (id, role), how the secret
-is kept out of source control, and how protected routes are validated._
-
-### Input Validation
-<!-- Member B -->
-_TODO: Explain how input is validated/rejected before processing._
-
-### HTTPS
-<!-- Member B -->
-_TODO: Explain HTTPS/SSL, why it matters, and how it is configured locally._
-
-### Secure Error Handling
-<!-- Member B -->
-_TODO: Explain how errors avoid leaking stack traces / paths / config._
-
-## Project Structure
+```text
+Client / Postman
+       |
+       | HTTPS
+       v
++-----------------------+
+| Node.js + Express API |
+|-----------------------|
+| Routes                |
+| Controllers           |
+| Validation            |
+| JWT Middleware        |
+| Error Handling        |
++-----------+-----------+
+            |
+            v
+     data/users.json
 ```
-api/
+
+The API boundary is HTTPS. Authentication credentials are received by the API over HTTPS, passwords are hashed with bcrypt before storage, and JWTs are used for subsequent authenticated requests.
+
+## 3. Project structure
+
+```text
+HustleHubPlus-Part1/
+├── certs/
+│   ├── server.crt
+│   └── server.key
+├── data/
+│   └── users.json
+├── postman/
+│   └── HustleHub-Part1.postman_collection.json
 ├── src/
-│   ├── config/       # DB connection
-│   ├── models/       # Mongoose schemas (User)
-│   ├── controllers/  # Request handlers (auth)
-│   ├── routes/       # Express routers
-│   ├── middleware/   # auth (JWT), validate, errorHandler
-│   └── utils/        # logger
-├── ssl/              # local SSL cert (gitignored)
-├── tests/            # unit tests (Part 2)
-└── server.js         # HTTPS entry point
-client/               # React frontend (Part 2)
+│   ├── controllers/
+│   │   └── authController.js
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   └── validate.js
+│   ├── routes/
+│   │   └── authRoutes.js
+│   ├── utils/
+│   │   └── userStore.js
+│   └── server.js
+├── .env.example
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
-## Getting Started
-<!-- OWNER: Member D -->
+## 4. Installation
 
-### Prerequisites
-- Node.js (LTS) and npm
-- A MongoDB Atlas connection string
-- Git
+Requirements:
+- Node.js 20 LTS or later
+- npm
+- Postman
 
-### Setup
+Run:
+
 ```bash
-# 1. Clone and enter the API
-cd api
-
-# 2. Install dependencies
 npm install
+```
 
-# 3. Create your local .env from the template
+Create the environment file:
+
+```bash
+copy .env.example .env
+```
+
+On macOS/Linux:
+
+```bash
 cp .env.example .env
-#    then edit .env with your real MONGO_URI and JWT_SECRET
+```
 
-# 4. Generate a local SSL certificate (self-signed) into api/ssl/
-#    (run once; certs are gitignored)
-#    openssl req -x509 -newkey rsa:2048 -nodes \
-#      -keyout ssl/key.pem -out ssl/cert.pem -days 365 \
-#      -subj "/CN=localhost"
+Change `JWT_SECRET` in `.env` to a long random value.
 
-# 5. Run the server
+## 5. Create the local HTTPS certificate
+
+For a development certificate, install OpenSSL and run:
+
+```bash
+openssl req -x509 -newkey rsa:2048 -nodes \
+  -keyout certs/server.key \
+  -out certs/server.crt \
+  -days 365 \
+  -subj "/C=ZA/ST=Gauteng/L=Johannesburg/O=HustleHubPlus/OU=Development/CN=localhost"
+```
+
+The certificate is for local development only.
+
+## 6. Run the server
+
+```bash
+npm start
+```
+
+Development mode:
+
+```bash
 npm run dev
 ```
 
-### Code quality (linting & formatting)
-This project uses ESLint + Prettier for consistent code style across the team.
-```bash
-npm run lint       # report issues
-npm run lint:fix   # auto-fix what it can
-npm run format     # apply Prettier formatting
+The API runs at:
+
+`https://localhost:3443`
+
+Because the certificate is self-signed, a browser/Postman may warn that the certificate is not trusted. This is expected for local development.
+
+## 7. Authentication flow
+
+### Registration
+
+`POST /api/auth/register`
+
+Example:
+
+```json
+{
+  "name": "John Freelancer",
+  "email": "john@example.com",
+  "password": "StrongPass123",
+  "role": "freelancer"
+}
 ```
-Run these before opening a pull request so diffs show real changes, not style noise.
 
-> **Node version:** the team baseline is Node 20 LTS (see `.nvmrc`). Newer
-> versions work, but if you hit a package issue, align with `nvm use`.
+The password is never stored directly. The backend hashes it using bcrypt and stores only the resulting password hash.
 
-_TODO (Member D): confirm these steps on a clean machine and add a note on
-generating a strong JWT_SECRET, e.g.:_
-`node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
+### Login
 
-## API Endpoints
-<!-- OWNER: Member A -->
-| Method | Endpoint            | Description                | Auth |
-|--------|---------------------|----------------------------|------|
-| GET    | /health             | Server health check        | No   |
-| POST   | /api/auth/register  | Register a new user        | No   |
-| POST   | /api/auth/login     | Log in, receive a JWT      | No   |
+`POST /api/auth/login`
 
-_TODO: Add request/response body examples once implemented._
+```json
+{
+  "email": "john@example.com",
+  "password": "StrongPass123"
+}
+```
 
-## Testing (Postman)
-<!-- OWNER: Member D -->
-_TODO: Describe the Postman collection (in /postman), covering successful
-registration and login plus invalid scenarios. Add screenshots of responses._
+A successful login returns a JWT.
 
-## Team & Contributions
-<!-- OWNER: everyone — fill in your name + student number + your slice -->
-| Member | Student No. | Responsibility |
-|--------|-------------|----------------|
-| _Name_ | _______ | Auth & Security core (hashing, JWT, protected routes) |
-| _Name_ | _______ | HTTPS, validation, error handling |
-| _Name_ | _______ | Data layer, DB config, architecture diagram |
-| _Name_ | _______ | Testing, Postman, README assembly, DevOps |
+### Protected request
 
-## Demonstration Video
-<!-- OWNER: Member D -->
-_TODO: Add the unlisted video link showing the API running, registration, and
-login with token generation._
+`GET /api/auth/me`
+
+Header:
+
+```text
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+The JWT middleware verifies:
+- signature
+- expiry
+- issuer
+- audience
+
+Only after successful validation does the request continue.
+
+## 8. Security decisions
+
+### Password hashing
+Passwords are hashed using bcrypt with a cost factor of 12. Plain-text passwords are never stored.
+
+### JWT
+The login endpoint creates a signed JWT containing the user's ID, email and role. The secret is stored in `.env`, not hard-coded in source code.
+
+### HTTPS
+The server uses Node's HTTPS module with a local SSL certificate. This protects credentials and tokens while they are transmitted.
+
+### Input validation
+Registration and login requests are validated with `express-validator`. Invalid fields receive HTTP 400 responses.
+
+### Error handling
+The API returns controlled messages. Stack traces, file paths, environment variables and configuration values are not returned to clients.
+
+### Duplicate accounts
+Registration checks whether the email already exists and returns HTTP 409 if it does.
+
+### Invalid credentials
+Login uses the same generic response for an unknown email and incorrect password, reducing user-enumeration risk.
+
+### HTTP status codes
+- 201: registration successful
+- 200: login/protected request successful
+- 400: validation failure
+- 401: authentication failure
+- 404: route/resource not found
+- 409: duplicate user
+- 500: controlled server error
+
+## 9. Part 1 limitations
+
+The assessment explicitly allows local in-memory or file-based storage for Part 1. A database is required later. This implementation therefore uses `data/users.json`.
+
+The client, gig management, booking, transactions, income and tax features are intentionally left for later parts.
+
+## 10. Postman tests
+
+Import the supplied Postman collection from:
+
+`postman/HustleHub-Part1.postman_collection.json`
+
+Test:
+1. Health check
+2. Successful registration
+3. Duplicate registration
+4. Invalid registration
+5. Successful login
+6. Invalid login
+7. Protected request without token
+8. Protected request with JWT
+
+## 11. Evidence to capture
+
+For the Part 1 submission, capture screenshots showing:
+- project structure
+- server running over HTTPS
+- successful registration
+- password hash in `users.json` (do not show a real password)
+- successful login with JWT
+- failed login
+- validation failure
+- protected route without JWT
+- protected route with valid JWT
+- Postman collection/tests
+
+Do not commit `.env`, `server.key`, or real secrets to GitHub.
+
+## 12. Suggested Git commits
+
+Use meaningful commits such as:
+
+```text
+feat: initialise secure express backend
+feat: add user registration
+feat: add bcrypt password hashing
+feat: add jwt authentication
+feat: protect authenticated routes
+feat: add input validation
+feat: add https configuration
+feat: add controlled error handling
+test: add postman authentication tests
+docs: add part 1 security documentation
+```
